@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cabinet Serein</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#F7F5F0;--surface:#FFFFFF;--border:#E8E4DC;
+  --text:#1A1A18;--muted:#7A7870;--accent:#2B5F4A;
+  --accent-light:#EAF3EE;--urgent:#C0392B;--urgent-light:#FDECEA;
+  --radius:12px;--font:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent)}
+.logo span{font-family:var(--font);font-size:12px;color:var(--muted);margin-left:10px;font-weight:400}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#27AE60;display:inline-block;margin-right:6px}
+.status-label{font-size:12px;color:var(--muted)}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface);padding:0 24px}
+.tab{padding:12px 20px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:all .2s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+
+.view{display:none;padding:20px 24px}
+.view.active{display:block}
+
+/* ── PATIENT VIEW ── */
+.chat-wrap{max-width:540px;margin:0 auto}
+.chat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.chat-messages{padding:16px;height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:82%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.55}
+.msg.bot{background:var(--bg);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;border:1px solid var(--border)}
+.msg.user{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg.typing span{display:inline-block;animation:bounce .8s ease infinite}
+.msg.typing span:nth-child(2){animation-delay:.15s}
+.msg.typing span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.chat-footer{padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px}
+.chat-footer input{flex:1;padding:9px 14px;border:1px solid var(--border);border-radius:20px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text);outline:none}
+.chat-footer input:focus{border-color:var(--accent)}
+.chat-footer button{padding:9px 16px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-size:13px;cursor:pointer;font-family:var(--font)}
+.quick-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.qbtn{padding:7px 13px;border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--muted);font-family:var(--font);transition:all .15s}
+.qbtn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+
+/* ── DASHBOARD VIEW ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.stat-val{font-size:28px;font-weight:300;color:var(--text)}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:4px}
+.queue-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.queue-title{font-size:14px;font-weight:500}
+.btn-reset{padding:7px 14px;border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--muted);font-family:var(--font)}
+.btn-reset:hover{background:#FDECEA;color:var(--urgent);border-color:#F5C6C3}
+.queue{display:flex;flex-direction:column;gap:8px}
+.ticket-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);transition:all .2s}
+.ticket-row.now{border-color:var(--accent);background:var(--accent-light)}
+.ticket-row.done{opacity:.45}
+.ticket-row.urgent-row{border-color:var(--urgent)}
+.t-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;background:var(--bg);color:var(--muted);flex-shrink:0;border:1px solid var(--border)}
+.ticket-row.now .t-num{background:var(--accent);color:#fff;border-color:var(--accent)}
+.ticket-row.urgent-row .t-num{background:var(--urgent-light);color:var(--urgent);border-color:var(--urgent)}
+.t-info{flex:1}
+.t-name{font-size:13px;font-weight:500}
+.t-time{font-size:11px;color:var(--muted);margin-top:2px}
+.badge{font-size:11px;padding:3px 9px;border-radius:20px}
+.badge-wait{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+.badge-now{background:var(--accent-light);color:var(--accent)}
+.badge-done{background:var(--bg);color:var(--muted)}
+.badge-urgent{background:var(--urgent-light);color:var(--urgent)}
+.call-btn{padding:7px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--font)}
+.call-btn:hover{opacity:.88}
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+
+/* ── NOTIF TOAST ── */
+.toast{position:absolute;top:70px;right:20px;background:var(--accent);color:#fff;padding:10px 16px;border-radius:var(--radius);font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="header">
+  <div>
+    <span class="logo">Cabinet Serein <span>Système de file d'attente</span></span>
+  </div>
+  <div>
+    <span class="status-dot"></span>
+    <span class="status-label">Système actif</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('patient')">Vue patient</div>
+  <div class="tab" onclick="switchTab('dashboard')">Dashboard médecin</div>
+</div>
+
+<!-- ── VUE PATIENT ── -->
+<div class="view active" id="view-patient">
+  <div class="chat-wrap">
+    <div class="quick-row">
+      <button class="qbtn" onclick="quickMsg('Bonjour, je voudrais un ticket pour aujourd\'hui')">Prendre un ticket</button>
+      <button class="qbtn" onclick="quickMsg('C\'est urgent, j\'ai une forte douleur')">Urgence</button>
+      <button class="qbtn" onclick="quickMsg('Quels sont vos horaires ?')">Horaires</button>
+      <button class="qbtn" onclick="quickMsg('C\'est quand mon tour ?')">Mon tour ?</button>
+    </div>
+    <div class="chat-box">
+      <div class="chat-messages" id="chat"></div>
+      <div class="chat-footer">
+        <input id="inp" placeholder="Écrivez un message..." onkeydown="if(event.key==='Enter')sendMsg()"/>
+        <button onclick="sendMsg()">Envoyer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div class="view" id="view-dashboard">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val" id="s-total">0</div><div class="stat-lbl">Patients aujourd'hui</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-wait">0</div><div class="stat-lbl">En attente</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-done">0</div><div class="stat-lbl">Consultés</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-slots">13</div><div class="stat-lbl">Places restantes</div></div>
+  </div>
+  <div class="queue-header">
+    <span class="queue-title">File d'attente</span>
+    <button class="btn-reset" onclick="resetDay()">Réinitialiser la journée</button>
+  </div>
+  <div class="queue" id="queue"></div>
+</div>
+
+<script>
+let history = [];
+let tickets = [];
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&name==='patient')||(i===1&&name==='dashboard')));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  if(name==='dashboard') loadTickets();
+}
+
+function addBotMsg(text) {
+  const chat = document.getElementById('chat');
+  const d = document.createElement('div');
+  d.className = 'msg bot';
+  d.innerHTML = text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function addUserMsg(text) {
+  const chat = document.getElementById('chat');
+  const d = document.createElement('div');
+  d.className = 'msg user';
+  d.textContent = text;
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function showTyping() {
+  const chat = document.getElementById('chat');
+  const d = document.createElement('div');
+  d.className = 'msg bot typing'; d.id = 'typing';
+  d.innerHTML = '<span>●</span><span>●</span><span>●</span>';
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if(t) t.remove();
+}
+
+async function sendMsg() {
+  const inp = document.getElementById('inp');
+  const text = inp.value.trim();
+  if(!text) return;
+  inp.value = '';
+  addUserMsg(text);
+  showTyping();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message: text, history })
+    });
+    const data = await res.json();
+    removeTyping();
+    addBotMsg(data.reply);
+    history.push({role:'user',content:text});
+    history.push({role:'assistant',content:data.reply});
+    if(data.tickets) tickets = data.tickets;
+  } catch(e) {
+    removeTyping();
+    addBotMsg('Désolé, une erreur s\'est produite. Veuillez réessayer.');
+  }
+}
+
+function quickMsg(text) {
+  document.getElementById('inp').value = text;
+  sendMsg();
+}
+
+async function loadTickets() {
+  try {
+    const res = await fetch('/api/tickets');
+    const data = await res.json();
+    tickets = data.tickets;
+    renderDashboard(data);
+  } catch(e) {}
+}
+
+function renderDashboard(data) {
+  document.getElementById('s-total').textContent = data.stats.total;
+  document.getElementById('s-wait').textContent = data.stats.waiting;
+  document.getElementById('s-done').textContent = data.stats.done;
+  document.getElementById('s-slots').textContent = data.stats.slotsLeft;
+
+  const queue = document.getElementById('queue');
+  if(!data.tickets.length) {
+    queue.innerHTML = '<div class="empty">Aucun patient pour le moment</div>';
+    return;
+  }
+  queue.innerHTML = data.tickets.map(t => `
+    <div class="ticket-row ${t.status} ${t.urgent?'urgent-row':''}">
+      <div class="t-num">${t.num}</div>
+      <div class="t-info">
+        <div class="t-name">${t.name}${t.urgent?' ⚠':''}${t.phone?' · '+t.phone:''}</div>
+        <div class="t-time">${t.heure}</div>
+      </div>
+      <span class="badge badge-${t.status==='now'?'now':t.status==='done'?'done':t.urgent?'urgent':'wait'}">
+        ${t.status==='now'?'En cours':t.status==='done'?'Terminé':t.urgent?'Urgent':'En attente'}
+      </span>
+      ${t.status==='wait'?`<button class="call-btn" onclick="callTicket(${t.num})">Appeler</button>`:''}
+    </div>
+  `).join('');
+}
+
+async function callTicket(num) {
+  try {
+    const res = await fetch('/api/tickets/'+num+'/call', {method:'POST'});
+    const data = await res.json();
+    tickets = data.tickets;
+    await loadTickets();
+    showToast('Patient N°'+num+' appelé — SMS envoyé');
+  } catch(e) {}
+}
+
+async function resetDay() {
+  if(!confirm('Réinitialiser toute la file d\'attente ?')) return;
+  await fetch('/api/reset', {method:'POST'});
+  await loadTickets();
+  showToast('Journée réinitialisée');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// Init
+addBotMsg(`Bonjour ! Je suis l'assistant du cabinet.\nJe peux vous aider à prendre un ticket, connaître votre heure d'attente ou répondre à vos questions.\n\nQue puis-je faire pour vous ?`);
+setInterval(()=>{ if(document.getElementById('view-dashboard').classList.contains('active')) loadTickets(); }, 10000);
+</script>
+</body>
+</html>

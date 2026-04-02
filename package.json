@@ -1,0 +1,17 @@
+{
+  "name": "cabinet-serein",
+  "version": "1.0.0",
+  "description": "Système de gestion de file d'attente pour cabinet médical",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "openai": "^4.28.0",
+    "twilio": "^4.22.0",
+    "dotenv": "^16.4.1",
+    "cors": "^2.8.5"
+  }
+}
